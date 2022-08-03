@@ -36,4 +36,30 @@ contract EmojiGameTest is Test {
         assertEq(enrichment, 100);
         assertEq(checked, block.timestamp);
     }
+
+    function testMyEmoji() public {
+        (
+            uint256 happiness,
+            uint256 hunger,
+            uint256 enrichment,
+            uint256 checked,
+
+        ) = emojiGame.myEmoji();
+
+        assertEq(happiness, (hunger + enrichment) / 2);
+        assertEq(hunger, 100);
+        assertEq(enrichment, 100);
+        assertEq(checked, block.timestamp);
+    }
+
+    function testPassTime() public {
+        emojiGame.passTime(0);
+        (uint256 happiness, uint256 hunger, uint256 enrichment, , ) = emojiGame
+            .emojiStats(0);
+
+        assertEq(hunger, 90);
+        assertEq(enrichment, 90);
+        assertEq(happiness, (hunger + enrichment) / 2);
+        assertEq(happiness, (90 + 90) / 2);
+    }
 }

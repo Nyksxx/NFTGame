@@ -31,8 +31,8 @@ contract EmojiGame is ERC721, ERC721URIStorage {
         string imageURI;
     }
 
-    mapping(address => uint256) emojiHolders;
-    mapping(uint256 => EmojiAttributes) emojiHolderAttributes;
+    mapping(address => uint256) public emojiHolders;
+    mapping(uint256 => EmojiAttributes) public emojiHolderAttributes;
 
     constructor() ERC721("Emoji", "EMJ") {}
 
@@ -121,5 +121,52 @@ contract EmojiGame is ERC721, ERC721URIStorage {
             emojiHolderAttributes[tokenId].lastChecked,
             emojiHolderAttributes[tokenId].imageURI
         );
+    }
+
+    function myEmoji()
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            string memory
+        )
+    {
+        return emojiStats(emojiHolders[msg.sender]);
+    }
+
+    function passTime(uint256 tokenId) public {
+        if (emojiHolderAttributes[tokenId].hunger > 10) {
+            emojiHolderAttributes[tokenId].hunger -= 10;
+        }
+        if (emojiHolderAttributes[tokenId].enrichment > 10) {
+            emojiHolderAttributes[tokenId].enrichment -= 10;
+        }
+        emojiHolderAttributes[tokenId].happiness =
+            (emojiHolderAttributes[tokenId].hunger +
+                emojiHolderAttributes[tokenId].enrichment) /
+            2;
+        updateURI(tokenId);
+    }
+
+    function updateURI(uint256 tokenId) private {
+        string memory emojiB64 = emojiBase64[0];
+        if (emojiHolderAttributes[tokenId].happiness == 100) {
+            emojiB64 = emojiBase64[0];
+        } else if (emojiHolderAttributes[tokenId].happiness > 66) {
+            emojiB64 = emojiBase64[1];
+        } else if (emojiHolderAttributes[tokenId].happiness > 33) {
+            emojiB64 = emojiBase64[2];
+        } else if (emojiHolderAttributes[tokenId].happiness > 0) {
+            emojiB64 = emojiBase64[3];
+        } else {
+            emojiB64 = emojiBase64[4];
+        }
+
+        string memory finalSVG = string(abi.encodePacked(SVGBase, emojiB64));
+        emojiHolderAttributes[tokenId].imageURI = finalSVG;
+        _setTokenURI(tokenId, tokenURI(tokenId));
     }
 }
