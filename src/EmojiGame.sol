@@ -50,7 +50,7 @@ contract EmojiGame is ERC721, ERC721URIStorage {
             lastChecked: block.timestamp,
             imageURI: finalSVG
         });
-        emojiHolders[to] = tokenId;
+        emojiHolders[msg.sender] = tokenId;
 
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, tokenURI(tokenId));
@@ -168,5 +168,25 @@ contract EmojiGame is ERC721, ERC721URIStorage {
         string memory finalSVG = string(abi.encodePacked(SVGBase, emojiB64));
         emojiHolderAttributes[tokenId].imageURI = finalSVG;
         _setTokenURI(tokenId, tokenURI(tokenId));
+    }
+
+    function feed() public {
+        uint256 tokenId = emojiHolders[msg.sender];
+        emojiHolderAttributes[tokenId].hunger += 10;
+        emojiHolderAttributes[tokenId].happiness =
+            (emojiHolderAttributes[tokenId].hunger +
+                emojiHolderAttributes[tokenId].enrichment) /
+            2;
+        updateURI(tokenId);
+    }
+
+    function play() public {
+        uint256 tokenId = emojiHolders[msg.sender];
+        emojiHolderAttributes[tokenId].enrichment += 10;
+        emojiHolderAttributes[tokenId].happiness =
+            (emojiHolderAttributes[tokenId].hunger +
+                emojiHolderAttributes[tokenId].enrichment) /
+            2;
+        updateURI(tokenId);
     }
 }

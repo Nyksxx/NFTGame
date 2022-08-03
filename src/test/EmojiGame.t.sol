@@ -62,4 +62,20 @@ contract EmojiGameTest is Test {
         assertEq(happiness, (hunger + enrichment) / 2);
         assertEq(happiness, (90 + 90) / 2);
     }
+
+    function testFeed() public {
+        emojiGame.passTime(0);
+        emojiGame.feed();
+        (uint256 happiness, uint256 hunger, , , ) = emojiGame.myEmoji();
+        assertEq(hunger, 100);
+        assertEq(happiness, (100 + 90) / 2);
+    }
+
+    function testPlay() public {
+        emojiGame.passTime(0);
+        emojiGame.play();
+        (uint256 happiness, , uint256 enrichment, , ) = emojiGame.myEmoji();
+        assertEq(enrichment, 100);
+        assertEq(happiness, (90 + 100) / 2);
+    }
 }
