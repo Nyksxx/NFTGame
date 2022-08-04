@@ -78,4 +78,28 @@ contract EmojiGameTest is Test {
         assertEq(enrichment, 100);
         assertEq(happiness, (90 + 100) / 2);
     }
+
+    function testCheckUpKeep() public {
+        bytes memory data = "";
+        bool upKeepNeeded = false;
+        (upKeepNeeded, ) = emojiGame.checkUpkeep(data);
+        assertTrue(upKeepNeeded == false);
+        vm.warp(block.timestamp + 100);
+        (upKeepNeeded, ) = emojiGame.checkUpkeep(data);
+        assertTrue(upKeepNeeded);
+    }
+
+    function testPerformUpKeep() public {
+        bytes memory data = "";
+
+        vm.warp(block.timestamp + 100);
+        emojiGame.performUpkeep(data);
+        (uint256 happiness, uint256 hunger, uint256 enrichment, , ) = emojiGame
+            .emojiStats(0);
+
+        assertEq(hunger, 90);
+        assertEq(enrichment, 90);
+        assertEq(happiness, (hunger + enrichment) / 2);
+        assertEq(happiness, (90 + 90) / 2);
+    }
 }
